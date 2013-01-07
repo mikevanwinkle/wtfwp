@@ -1,5 +1,12 @@
 <?php
 
+function wtwp_ajax_ping() {
+	echo("PONG");
+	die(); // mandatory :/
+}
+
+add_action('wp_ajax_wtwp_ping', 'wtwp_ajax_ping');
+
 function wtwp_echo_array_table($vals) {
 	echo("<table>\n");
 	foreach($vals as $name => $value) {
@@ -40,8 +47,19 @@ function wtwp_echo_subsystem_status() {
 	}
 
 	wtwp_echo_array_table($status);
+	echo("admin ajax is <span id='wtwp-ajax-ping'>FAILING</span>");
+	echo("<script>
+		jQuery(document).ready(function($){
+			$.post(ajaxurl, {action: 'wtwp_ping'}, function(response) {
+				if(response == 'PONG') {
+					$('#wtwp-ajax-ping').text('OK');
+				} else {
+					alert(response);
+				}
+			});
+		});
+	      </script>");
 }
-	
 
 function wtwp_add_dashboard_widgets() {
 	wp_add_dashboard_widget('wtwp_table_of_status', 'WTWP Subsystem Status', 'wtwp_echo_subsystem_status');
